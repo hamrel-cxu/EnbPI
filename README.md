@@ -36,7 +36,7 @@
 
 ## Talk and Slides
 
-- We are fortunate to pre-record a long presentation and give an oral presentation at the Proceedings of the 38th International Conference on Machine Learning (ICML 2021). The long presentation is available on Slideslive and the oral presentation will be given at the conference once the date is finalized.
+- We are fortunate to pre-record a long presentation and give an oral presentation at the Proceedings of the 38th International Conference on Machine Learning (ICML 2021). The long presentation is [available on Slideslive](https://recorder-v3.slideslive.com/?share=37762&s=ee12530c-5218-4c9e-8bb3-5107ceb79f41) and the oral presentation will be given at the conference once the date is finalized.
 - The slide for the talk is [available here](https://github.com/hamrel-cxu/EnbPI/blob/main/ICML2021_Slide.pdf).
 
 ## Extension Works/Ideas
