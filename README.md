@@ -40,10 +40,14 @@
 - The slide for the talk is [available here](https://github.com/hamrel-cxu/EnbPI/blob/main/ICML2021_Slide.pdf).
 
 ## Extension Works/Ideas
+- [Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data](https://arxiv.org/abs/2105.11886) (Xu et al. 2021b) is our recent applicable work on adopting **EnbPI** for detecting anomalous traffic flows. Our method significantly outperforms competing methods (Table 1). It has been accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2021](https://sites.google.com/berkeley.edu/dfuq21/)).
+- We are also actively exploring ways further improve **EnbPI** in classification, so that the resulting prediction sets work well for correlated categorical observations.
 
 ## FAQ
+1. Encountering "NotImplementedError: Cannot convert a symbolic Tensor (lstm_2/strided_slice:0) to a numpy array" when using RNN as the regression model:
+- See [this github answer](https://stackoverflow.com/questions/66207609/notimplementederror-cannot-convert-a-symbolic-tensor-lstm-2-strided-slice0-t) to resolve the problem, primarily due to numpy & python version issues.
 
 ## References
-- Xu 2021a, conformal...
-- Xu 2021b, anomaly detection for traffic...
+- Xu, Chen and Yao Xie (2021a). Conformal prediction interval for dynamic time-series. arXiv: 2010.09107 [stat.ME].
+- Xu, Chen and Yao Xie (2021b). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. arXiv: 2105.11886 [stat.AP].
 
