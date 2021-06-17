@@ -6,7 +6,6 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import Ridge
 from sklearn import preprocessing
 import seaborn as sns
-from scipy.stats import beta
 from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
 import itertools

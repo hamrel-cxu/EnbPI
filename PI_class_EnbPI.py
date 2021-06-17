@@ -1,6 +1,6 @@
 import importlib
 import warnings
-from utils_EnbPI import generate_bootstrap_samples, strided_app, weighted_quantile, beta_percentile
+from utils_EnbPI import generate_bootstrap_samples, strided_app, weighted_quantile
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from sklearn.linear_model import LogisticRegression
