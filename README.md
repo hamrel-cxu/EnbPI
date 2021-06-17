@@ -2,7 +2,7 @@
 
 > Talk, Code, Extension Ideas for Our ICML 2021 Oral Work: [Conformal Prediction Interval for Dynamic Time-series](https://arxiv.org/abs/2010.09107) (Xu et al. 2021a). <!-- Please refer to codes in this repository for usage, as those downloaded from [PMLR]() had not been clearly explained. --> <!-- Put a link here once PMLR shows my work -->
 
-> Please [cite our work](https://scholar.googleusercontent.com/scholar.bib?q=info:vRYXCEzOtMYJ:scholar.google.com/&output=citation&scisdr=CgUOqUutEIyS3DDh0oY:AAGBfm0AAAAAYMnkyoYEEFlWj6xiq_7xqYFEUSe0En5z&scisig=AAGBfm0AAAAAYMnkykFh_alIIr5Kux45QYrIHoXsJkRq&scisf=4&ct=citation&cd=-1&hl=zh-CN) if you find it interesting and inspiring to your work. 
+> Please [cite our work](https://scholar.google.com/scholar_lookup?title=Conformal%20prediction%20interval%20for%20dynamic%20time-series&author=Chen%20Xu&author=Yao%20Xie&publication_date=2021/06/16&arxiv_id=2010.09107) if you find it interesting and inspiring to your work. 
 
 > Please direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
 
