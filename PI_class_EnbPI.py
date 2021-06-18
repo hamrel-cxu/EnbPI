@@ -6,7 +6,6 @@ import statsmodels.api as sm
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 import pandas as pd
-import time as time
 import os
 import keras
 from keras.models import Sequential
