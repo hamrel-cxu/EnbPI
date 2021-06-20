@@ -51,7 +51,7 @@ CA_cities = ['Fremont', 'Milpitas', 'Mountain_View', 'North_San_Jose',
              'Palo_Alto', 'Redwood_City', 'San_Mateo', 'Santa_Clara',
              'Sunnyvale']
 for city in CA_cities:
-    globals()['data%s' % city] = read_CA_data(f'{city}_data.csv')
+    globals()['data%s' % city] = read_CA_data(f'Data/{city}_data.csv')
 stride = 1
 miss_test_idx = []
 alpha = 0.1
@@ -183,7 +183,7 @@ for one_dim in [True, False]:
                             train_size, alpha, inplace=True)
                     results_ts = pd.concat([results_ts, result_ts])
                     results_ts.to_csv(
-                        f'Result/{data_name}_many_alpha_new_ARIMA.csv', index=False)
+                        f'Results/{data_name}_many_alpha_new_ARIMA.csv', index=False)
                 # CP Methods
                 print(f'regressor is {ridge_cv.__class__.__name__}')
                 result_ridge = ridge_results.run_experiments(
@@ -216,19 +216,19 @@ for one_dim in [True, False]:
                 results = pd.concat([results, results_now])
                 if one_dim:
                     results.to_csv(
-                        f'Result/{data_name}_many_alpha_new_1d.csv', index=False)
+                        f'Results/{data_name}_many_alpha_new_1d.csv', index=False)
                 else:
                     results.to_csv(
-                        f'Result/{data_name}_many_alpha_new.csv', index=False)
+                        f'Results/{data_name}_many_alpha_new.csv', index=False)
 
 
 def merge_arima(data_name, which):
-    data1 = pd.read_csv(f'{data_name}_many_alpha_new{which}.csv')
-    data2 = pd.read_csv(f'{data_name}_many_alpha_new_ARIMA.csv')
+    data1 = pd.read_csv(f'Results/{data_name}_many_alpha_new{which}.csv')
+    data2 = pd.read_csv(f'Results/{data_name}_many_alpha_new_ARIMA.csv')
     data1 = pd.concat((data1, data2))
     data1.reset_index(inplace=True)
     print(data1.shape)
-    data1.to_csv(f'{data_name}_many_alpha_new{which}.csv', index=False)
+    data1.to_csv(f'Results/{data_name}_many_alpha_new{which}.csv', index=False)
 
 
 for data_name in Data_name:
@@ -316,10 +316,10 @@ for one_dim in [True, False]:
                         [results, result_ridge, result_rf, result_nn])
                 if one_dim:
                     results.to_csv(
-                        f'Result/{data_name}_many_train_new_1d.csv', index=False)
+                        f'Results/{data_name}_many_train_new_1d.csv', index=False)
                 else:
                     results.to_csv(
-                        f'Result/{data_name}_many_train_new.csv', index=False)
+                        f'Results/{data_name}_many_train_new.csv', index=False)
 
 ''' Plots'''
 Data_name = ['green_house', 'appliances',
@@ -680,7 +680,7 @@ def all_together(Data_name, sub, no_slide, missing, miss_frac=0.25, one_dim=Fals
 ATL_cities = ['Solar_Atl']
 max_data_size = 10000
 dataSolar_Atl = util.read_data(
-    3, '../Real Data/Solar_Atl_data.csv', max_data_size)
+    3, 'Data/Solar_Atl_data.csv', max_data_size)
 # s=14, all hours
 results_ls_one_d_no_missing_and_slide_sub = all_together(
     Data_name=ATL_cities, sub=1, no_slide=False, missing=False, one_dim=True)
@@ -749,7 +749,7 @@ CA_cities = ['Fremont', 'Milpitas', 'Mountain_View', 'North_San_Jose',
              'Sunnyvale']
 CA_cities = ['Palo_Alto']
 for city in CA_cities:
-    globals()['data%s' % city] = read_CA_data(f'../Real Data/{city}_data.csv')
+    globals()['data%s' % city] = read_CA_data(f'Data/{city}_data.csv')
 
 '''1. Multi-step inference: first two are for my EnbPI, last two for no slide'''
 # Returns a dictionary with results at each city in CA

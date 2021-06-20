@@ -94,7 +94,7 @@ def read_CA_data(filename):
 def read_wind_data():
     ''' Note, just use the 8760 hourly observation in 2019
     Github repo is here: https://github.com/Duvey314/austin-green-energy-predictor'''
-    data_wind_19 = pd.read_csv('Wind_Hackberry_Generation_2019_2020.csv')
+    data_wind_19 = pd.read_csv('Data/Wind_Hackberry_Generation_2019_2020.csv')
     data_wind_19 = data_wind_19.iloc[:24*365, :]
     return data_wind_19
 
@@ -400,7 +400,7 @@ def grouped_box_new(dataname, type, extra_save=''):
     results.sort_values('method', inplace=True, ascending=True)
     results.loc[results.method == 'Ensemble', 'method'] = 'EnbPI'
     results.loc[results.method == 'Weighted_ICP', 'method'] = 'Weighted ICP'
-    results_1d = pd.read_csv(f'{dataname}_many_train_new_1d{extra_save}.csv')
+    results_1d = pd.read_csv(f'Results/{dataname}_many_train_new_1d{extra_save}.csv')
     results_1d.sort_values('method', inplace=True, ascending=True)
     results_1d.loc[results_1d.method == 'Ensemble', 'method'] = 'EnbPI'
     results_1d.loc[results_1d.method == 'Weighted_ICP', 'method'] = 'Weighted ICP'
@@ -501,7 +501,7 @@ def grouped_box_new_with_JaB(dataname):
        extra_save is for special suffix of plot (such as comparing NN and RNN)'''
     font_size = 18
     label_size = 20
-    results = pd.read_csv(f'{dataname}_many_train_new_with_JaB.csv')
+    results = pd.read_csv(f'Results/{dataname}_many_train_new_with_JaB.csv')
     results.sort_values('method', inplace=True, ascending=True)
     results.loc[results.method == 'Ensemble', 'method'] = 'EnbPI'
     # results.loc[results.method == 'Weighted_ICP', 'method'] = 'Weighted ICP'

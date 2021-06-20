@@ -150,12 +150,12 @@ for one_dim in [True, False]:
 
 
 def merge_arima(data_name, which):
-    data1 = pd.read_csv(f'{data_name}_many_alpha_new{which}.csv')
-    data2 = pd.read_csv(f'{data_name}_many_alpha_new_ARIMA.csv')
+    data1 = pd.read_csv(f'Results/{data_name}_many_alpha_new{which}.csv')
+    data2 = pd.read_csv(f'Results/{data_name}_many_alpha_new_ARIMA.csv')
     data1 = pd.concat((data1, data2))
     data1.reset_index(inplace=True)
     print(data1.shape)
-    data1.to_csv(f'{data_name}_many_alpha_new{which}.csv', index=False)
+    data1.to_csv(f'Results/{data_name}_many_alpha_new{which}.csv', index=False)
 
 
 for data_name in Data_name:
@@ -436,7 +436,7 @@ def all_together(Data_name, sub, no_slide, missing, miss_frac=0.25, one_dim=Fals
 
 ATL_cities = ['Solar_Atl']
 max_data_size = 10000
-dataSolar_Atl = util.read_data(3, 'Data/Solar_Atl_data.csv', max_data_size)
+dataSolar_Atl = util.Results/_data(3, 'Data/Solar_Atl_data.csv', max_data_size)
 # Get results
 results_ls_with_missing_and_slide_sub = all_together(
     Data_name=ATL_cities, sub=1, no_slide=False, missing=True, one_dim=False)
@@ -448,16 +448,16 @@ util.make_cond_plots(Data_name, results_ls_with_missing_and_slide_sub,
 '''Figure 4: Anomaly Detection by ECAD '''
 '''Credit Card Fraud # 2: Data retrieved here: https://www.kaggle.com/mlg-ulb/creditcardfraud
     Data shape is (284807, 31)'''
-# HBOS: https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.hbos
-# IForest: https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.iforest
-# OCSVM https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.ocsvm
-# PCA: https://pyod.readthedocs.io/en/latest/pyod.models.html#module-pyod.models.pca
+# HBOS: https://pyod.Results/thedocs.io/en/latest/pyod.models.html#module-pyod.models.hbos
+# IForest: https://pyod.Results/thedocs.io/en/latest/pyod.models.html#module-pyod.models.iforest
+# OCSVM https://pyod.Results/thedocs.io/en/latest/pyod.models.html#module-pyod.models.ocsvm
+# PCA: https://pyod.Results/thedocs.io/en/latest/pyod.models.html#module-pyod.models.pca
 
 '''Get data and downsample'''
 
 
 def get_data_and_true_abnormal(tot_len):
-    dataset = pd.read_csv('Data/Money_Laundry.csv', nrows=tot_len)
+    dataset = pd.Results/_csv('Data/Money_Laundry.csv', nrows=tot_len)
     dataset.drop('Time', axis=1, inplace=True)
     true_abnormal = np.where(dataset.Class == 1)[0]
     return dataset, true_abnormal
@@ -557,5 +557,5 @@ for itrial in range(tot_trial):
             results.to_csv(f'Results/Kaggle_results.csv', index=False)
 
 
-results = pd.read_csv('Results/Kaggle_results.csv')
+results = pd.Results/_csv('Results/Kaggle_results.csv')
 AD_algos.plt_prec_recall_F1(results)
