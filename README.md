@@ -8,9 +8,9 @@
 
 ## Table of Contents
 * [How to use](#how-to-use)
-* [Poster, Talk, and Slides](#talk)
-* [Extension Works/Ideas](#extension)
-* [FAQ](#FAQ)
+* [Poster Talk and Slides](#poster-talk-and-slides)
+* [Extension Works and Ideas](#extension-works-and-ideas)
+* [FAQ](#faq)
 * [References](#references)
 <!-- * [License](#license) -->
 
@@ -34,13 +34,13 @@
   - **If other regression models:** Make sure the model has methods `.fit(X_train, Y_train)` to train a predictor and `.predict(X_predict)` to make predictions on new data. Most models in [sklearn](https://scikit-learn.org/stable/supervised_learning.html) or deep learning models built by keras/pytorch are capable of doing so.
   - **If other data:** We have assumed that all our datasets are save as `pandas.DataFrame` and convertible to `numpy.array`. However, such assumptions are purely computational. Please feel free to adjust the data formate as long as it can be processed by regression models of choice.
 
-## Poster, Talk, and Slides
+## Poster Talk and Slides
 
 - The poster for our work is [available via this link](https://github.com/hamrel-cxu/EnbPI/blob/main/ICML%20Poster.png).
 - We are fortunate to pre-record a long presentation and give an oral presentation at the Proceedings of the 38th International Conference on Machine Learning (ICML 2021). The long presentation is [available on Slideslive](https://recorder-v3.slideslive.com/?share=37762&s=ee12530c-5218-4c9e-8bb3-5107ceb79f41) and the oral presentation will be given at the conference once the date is finalized.
 - The slide for the talk is [available here](https://github.com/hamrel-cxu/EnbPI/blob/main/ICML2021_Slide.pdf).
 
-## Extension Works/Ideas
+## Extension Works and Ideas
 - [Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data](https://arxiv.org/abs/2105.11886) (Xu et al. 2021b) is our recent applicable work on adopting **EnbPI** for detecting anomalous traffic flows. Our method significantly outperforms competing methods (Table 1). It has been accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2021](https://sites.google.com/berkeley.edu/dfuq21/)).
 - We are also actively exploring ways further improve **EnbPI** in classification, so that the resulting prediction sets work well for correlated categorical observations.
 
