@@ -436,7 +436,7 @@ def all_together(Data_name, sub, no_slide, missing, miss_frac=0.25, one_dim=Fals
 
 ATL_cities = ['Solar_Atl']
 max_data_size = 10000
-dataSolar_Atl = util.Results/_data(3, 'Data/Solar_Atl_data.csv', max_data_size)
+dataSolar_Atl = util.read_data(3, 'Data/Solar_Atl_data.csv', max_data_size)
 # Get results
 results_ls_with_missing_and_slide_sub = all_together(
     Data_name=ATL_cities, sub=1, no_slide=False, missing=True, one_dim=False)
