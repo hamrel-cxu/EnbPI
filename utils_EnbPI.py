@@ -19,6 +19,7 @@ import time
 from keras.layers import LSTM, Dense, Dropout
 from keras.models import Sequential
 from keras.optimizers import Adam
+import calendar
 '''Helpers for read data '''
 
 
