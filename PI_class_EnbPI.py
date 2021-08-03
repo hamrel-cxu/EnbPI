@@ -34,7 +34,6 @@ class prediction_interval():
         self.Ensemble_fitted_func = []
         # it will store residuals e_1, e_2,... from Ensemble
         self.Ensemble_online_resid = np.array([])
-        self.Ensemble_online_resid_non_abs = np.array([])  # Non-absolute value version
         self.ICP_fitted_func = []  # it only store 1 fitted ICP func.
         # it will store residuals e_1, e_2,... from ICP
         self.ICP_online_resid = np.array([])
@@ -88,18 +87,17 @@ class prediction_interval():
         for i in range(n):
             b_keep = np.argwhere(~(in_boot_sample[:, i])).reshape(-1)
             if(len(b_keep) > 0):
-                resid_LOO = self.Y_train[i] - boot_predictions[b_keep, i].mean()
+                resid_LOO = np.abs(self.Y_train[i] - boot_predictions[b_keep, i].mean())
+                self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, resid_LOO)
                 out_sample_predict[i] = boot_predictions[b_keep, n:].mean(0)
             else:  # if aggregating an empty set of models, predict zero everywhere
-                resid_LOO = self.Y_train[i]
+                resid_LOO = np.abs(self.Y_train[i])
+                self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, resid_LOO)
                 out_sample_predict[i] = np.zeros(n1)
-            self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, np.abs(resid_LOO))
-            self.Ensemble_online_resid_non_abs = np.append(
-                self.Ensemble_online_resid_non_abs, resid_LOO)
         sorted_out_sample_predict = np.sort(out_sample_predict, axis=0)[ind_q]  # length n1
         # TODO: Change this, because ONLY minus the non-missing predictions
         # However, need to make sure same length is maintained, o/w sliding cause problem
-        resid_out_sample = sorted_out_sample_predict-self.Y_predict
+        resid_out_sample = np.abs(sorted_out_sample_predict-self.Y_predict)
         if len(miss_test_idx) > 0:
             # Replace missing residuals with that from the immediate predecessor that is not missing
             for l in range(len(miss_test_idx)):
@@ -114,12 +112,10 @@ class prediction_interval():
                     # The first Y during testing is missing, let it be the last of the training residuals
                     # note, training data already takes out missing values, so doing is is fine
                     resid_out_sample[0] = self.Ensemble_online_resid[-1]
-        self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, np.abs(resid_out_sample))
-        self.Ensemble_online_resid_non_abs = np.append(
-            self.Ensemble_online_resid_non_abs, resid_out_sample)
+        self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, resid_out_sample)
         return(sorted_out_sample_predict)
 
-    def compute_PIs_Ensemble_online(self, alpha, B, stride, miss_test_idx, density_est=False, skewness='right'):
+    def compute_PIs_Ensemble_online(self, alpha, B, stride, miss_test_idx, density_est=False):
         '''
             Note, this is not online version, so all test points have the same width
         '''
@@ -128,9 +124,9 @@ class prediction_interval():
         # Now f^b and LOO residuals have been constructed from earlier
         out_sample_predict = self.fit_bootstrap_models_online(
             alpha, B, miss_test_idx)  # length of n1
+        ind_q = int(100*(1-alpha))
         # start = time.time()
         if density_est:
-            # This part basically NEVER uses
             blocks = int(n1/stride)
             ind_q = np.zeros(blocks)
             p_vals = self.Ensemble_online_resid[:n]  # This will be changing
@@ -150,41 +146,11 @@ class prediction_interval():
             for i in range(blocks):
                 width[i] = np.percentile(strided_resid[i], ind_q[i], axis=-1)
         else:
-            # if skewness == 'right':
-            #     # Under-estimate, so alpha left and 1-alpha right
-            #     ind_q_left = int(100*alpha)
-            #     ind_q_right = int(100*(1-alpha))
-            #     width_left = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
-            #     width_right = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
-            # if skewness == 'left':
-            #     # Over-estimate, so 1-alpha left and alpha right
-            #     ind_q_left = int(100*(1-alpha))
-            #     ind_q_right = int(100*alpha)
-            #     width_left = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
-            #     width_right = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
-            # if skewness == 'none':
-            #     # Under-estimate, so 1-alpha left and right
-            #     ind_q = int(100*(1-alpha))
-            #     width_left = np.percentile(strided_app(
-            #         self.Ensemble_online_resid[:-1], n, stride), ind_q, axis=-1)
-            #     width_right = width_left
-            # NOTE: we should twist this a bit depending on the SMALLEST and LARGEST residuals (e.g. if smallest residual very negative, then small left index cause the interval to have TOO small lower end. When the dataset skew right, such behavior is undesirable)
-            # When data skew right, we would prefer this as close to alpha as possible to avoid having too low lower end
-            frac = alpha/1.1
-            ind_q_left = int(100*frac)
-            ind_q_right = int(100*(1-frac))
-            width_left = np.percentile(strided_app(
-                self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
-            width_right = np.percentile(strided_app(
-                self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
-        width_left = np.abs(np.repeat(width_left, stride))  # This is because |width|=T/stride.
-        width_right = np.abs(np.repeat(width_right, stride))  # This is because |width|=T/stride.
-        PIs_Ensemble = pd.DataFrame(np.c_[out_sample_predict-width_left,
-                                          out_sample_predict+width_right], columns=['lower', 'upper'])
+            width = np.percentile(strided_app(
+                self.Ensemble_online_resid[:-1], n, stride), ind_q, axis=-1)
+        width = np.abs(np.repeat(width, stride))  # This is because |width|=T/stride.
+        PIs_Ensemble = pd.DataFrame(np.c_[out_sample_predict-width,
+                                          out_sample_predict+width], columns=['lower', 'upper'])
         # print(time.time()-start)
         return PIs_Ensemble
 
@@ -378,7 +344,7 @@ class prediction_interval():
         All together
     '''
 
-    def run_experiments(self, alpha, B, stride, data_name, itrial,  miss_test_idx, skewness, true_Y_predict=[], density_est=False, get_plots=False, none_CP=False, methods=['Ensemble', 'ICP', 'Weighted_ICP']):
+    def run_experiments(self, alpha, B, stride, data_name, itrial,  miss_test_idx, true_Y_predict=[], density_est=False, get_plots=False, none_CP=False, methods=['Ensemble', 'ICP', 'Weighted_ICP']):
         '''
             Note, it is assumed that real data has been loaded, so in actual execution,
             generate data before running this
@@ -414,9 +380,6 @@ class prediction_interval():
                                                (1-1./(1+train_size))**n, size=1))
                     PI = self.compute_PIs_JaB(alpha, B)
                 elif method == 'Ensemble':
-                    # TODO: fix the error on "name 'right' is not defined"
-                    # PI = eval(f'compute_PIs_{method}_online({alpha},{B},{stride},{miss_test_idx},{skewness},{density_est})',
-                    #           globals(), {k: getattr(self, k) for k in dir(self)})
                     PI = eval(f'compute_PIs_{method}_online({alpha},{B},{stride},{miss_test_idx},{density_est})',
                               globals(), {k: getattr(self, k) for k in dir(self)})
                 else:
