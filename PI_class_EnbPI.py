@@ -33,8 +33,7 @@ class prediction_interval():
         # it will be updated with a list of bootstrap models, fitted on subsets of training data
         self.Ensemble_fitted_func = []
         # it will store residuals e_1, e_2,... from Ensemble
-        self.Ensemble_online_resid = np.array([])
-        self.Ensemble_online_resid_non_abs = np.array([])  # Non-absolute value version
+        self.Ensemble_online_resid = np.array([])  # Non-absolute value version
         self.ICP_fitted_func = []  # it only store 1 fitted ICP func.
         # it will store residuals e_1, e_2,... from ICP
         self.ICP_online_resid = np.array([])
@@ -93,9 +92,8 @@ class prediction_interval():
             else:  # if aggregating an empty set of models, predict zero everywhere
                 resid_LOO = self.Y_train[i]
                 out_sample_predict[i] = np.zeros(n1)
-            self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, np.abs(resid_LOO))
-            self.Ensemble_online_resid_non_abs = np.append(
-                self.Ensemble_online_resid_non_abs, resid_LOO)
+            self.Ensemble_online_resid = np.append(
+                self.Ensemble_online_resid, resid_LOO)
         sorted_out_sample_predict = np.sort(out_sample_predict, axis=0)[ind_q]  # length n1
         # TODO: Change this, because ONLY minus the non-missing predictions
         # However, need to make sure same length is maintained, o/w sliding cause problem
@@ -114,9 +112,8 @@ class prediction_interval():
                     # The first Y during testing is missing, let it be the last of the training residuals
                     # note, training data already takes out missing values, so doing is is fine
                     resid_out_sample[0] = self.Ensemble_online_resid[-1]
-        self.Ensemble_online_resid = np.append(self.Ensemble_online_resid, np.abs(resid_out_sample))
-        self.Ensemble_online_resid_non_abs = np.append(
-            self.Ensemble_online_resid_non_abs, resid_out_sample)
+        self.Ensemble_online_resid = np.append(
+            self.Ensemble_online_resid, resid_out_sample)
         return(sorted_out_sample_predict)
 
     def compute_PIs_Ensemble_online(self, alpha, B, stride, miss_test_idx, density_est=False, skewness='right'):
@@ -155,17 +152,17 @@ class prediction_interval():
             #     ind_q_left = int(100*alpha)
             #     ind_q_right = int(100*(1-alpha))
             #     width_left = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
+            #         self.Ensemble_online_resid[:-1], n, stride), ind_q_left, axis=-1)
             #     width_right = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
+            #         self.Ensemble_online_resid[:-1], n, stride), ind_q_right, axis=-1)
             # if skewness == 'left':
             #     # Over-estimate, so 1-alpha left and alpha right
             #     ind_q_left = int(100*(1-alpha))
             #     ind_q_right = int(100*alpha)
             #     width_left = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
+            #         self.Ensemble_online_resid[:-1], n, stride), ind_q_left, axis=-1)
             #     width_right = np.percentile(strided_app(
-            #         self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
+            #         self.Ensemble_online_resid[:-1], n, stride), ind_q_right, axis=-1)
             # if skewness == 'none':
             #     # Under-estimate, so 1-alpha left and right
             #     ind_q = int(100*(1-alpha))
@@ -178,9 +175,9 @@ class prediction_interval():
             ind_q_left = int(100*frac)
             ind_q_right = int(100*(1-frac))
             width_left = np.percentile(strided_app(
-                self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_left, axis=-1)
+                self.Ensemble_online_resid[:-1], n, stride), ind_q_left, axis=-1)
             width_right = np.percentile(strided_app(
-                self.Ensemble_online_resid_non_abs[:-1], n, stride), ind_q_right, axis=-1)
+                self.Ensemble_online_resid[:-1], n, stride), ind_q_right, axis=-1)
         width_left = np.abs(np.repeat(width_left, stride))  # This is because |width|=T/stride.
         width_right = np.abs(np.repeat(width_right, stride))  # This is because |width|=T/stride.
         PIs_Ensemble = pd.DataFrame(np.c_[out_sample_predict-width_left,
