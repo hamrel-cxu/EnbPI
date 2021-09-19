@@ -1,3 +1,4 @@
+from keras.layers import Dense
 from scipy.linalg import norm
 from sklearn.linear_model import RidgeCV
 from sklearn.linear_model import LassoCV
