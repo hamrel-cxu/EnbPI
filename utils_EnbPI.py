@@ -496,6 +496,27 @@ def grouped_box_new(dataname, type, extra_save=''):
         pad_inches=0)
 
 
+def set_share_axes(axs, target=None, sharex=False, sharey=False):
+    if target is None:
+        target = axs.flat[0]
+    # Manage share using grouper objects
+    for ax in axs.flat:
+        if sharex:
+            target._shared_x_axes.join(target, ax)
+        if sharey:
+            target._shared_y_axes.join(target, ax)
+    # Turn off x tick labels and offset text for all but the bottom row
+    if sharex and axs.ndim > 1:
+        for ax in axs[:-1, :].flat:
+            ax.xaxis.set_tick_params(which='both', labelbottom=False, labeltop=False)
+            ax.xaxis.offsetText.set_visible(False)
+    # Turn off y tick labels and offset text for all but the left most column
+    if sharey and axs.ndim > 1:
+        for ax in axs[:, 1:].flat:
+            ax.yaxis.set_tick_params(which='both', labelleft=False, labelright=False)
+            ax.yaxis.offsetText.set_visible(False)
+
+
 def grouped_box_new_with_JaB(dataname):
     '''First (Second) row contains grouped boxplots for multivariate (univariate) for Ridge, RF, and NN.
        Each boxplot contains coverage and width for all three PI methods over 3 (0.1, 0.3, 0.5) train/total data, so 3*3 boxes in total
