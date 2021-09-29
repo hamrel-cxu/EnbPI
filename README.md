@@ -1,6 +1,6 @@
 # Sequential Distribution-free Ensemble Batch Prediction Intervals (EnbPI)
 
->**Important Update:** We have been improving the ICML 2021 work for a journal submission. An arxiv version has been posted and linked to this repository for method implementation of both works. The current repository will soon be under one branch and the journal method under another (to be posted).
+>**Important Update:** We have been improving the ICML 2021 work for a journal submission. An [arxiv version](https://arxiv.org/abs/2010.09107) has been posted and linked to this repository for method implementation of both works. The current repository will soon be under one branch and the journal method under another (to be posted).
 
 > Talk, Code, Extension Ideas for Our ICML 2021 Oral Work: [Conformal Prediction Interval for Dynamic Time-series](https://arxiv.org/abs/2010.09107) (Xu et al. 2021a). <!-- Please refer to codes in this repository for usage, as those downloaded from [PMLR]() had not been clearly explained. --> <!-- Put a link here once PMLR shows my work -->
 
