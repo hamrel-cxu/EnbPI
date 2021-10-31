@@ -51,6 +51,6 @@
 - See [this github answer](https://stackoverflow.com/questions/66207609/notimplementederror-cannot-convert-a-symbolic-tensor-lstm-2-strided-slice0-t) to resolve the problem, primarily due to numpy & python version issues.
 
 ## References
-- Xu, Chen and Yao Xie (2021a). Conformal prediction interval for dynamic time-series. arXiv: 2010.09107 [stat.ME].
+- Xu, Chen and Yao Xie (2021a). Conformal prediction interval for dynamic time-series. The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.
 - Xu, Chen and Yao Xie (2021b). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. arXiv: 2105.11886 [stat.AP].
 
