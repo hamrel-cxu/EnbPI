@@ -1,4 +1,4 @@
-# Sequential Distribution-free Ensemble Batch Prediction Intervals (EnbPI)
+# !Sequential Distribution-free Ensemble Batch Prediction Intervals (EnbPI)!
 
 >**Important Update:** We have been improving the ICML 2021 work for a journal submission. An [arxiv version](https://arxiv.org/abs/2010.09107) has been posted and linked to this repository for method implementation of both works. The current repository will soon be under one branch and the journal method under another (to be posted).
 
