@@ -1,8 +1,9 @@
 # Sequential Distribution-free Ensemble Batch Prediction Intervals (EnbPI)
 
->**Important Update:** We have been improving the ICML 2021 work for a journal submission. An [arxiv version](https://arxiv.org/abs/2010.09107) has been posted and linked to this repository for method implementation of both works. The current repository will soon be under one branch and the journal method under another (to be posted).
-
-> Talk, Code, Extension Ideas for Our ICML 2021 Oral Work: [Conformal Prediction Interval for Dynamic Time-series](https://arxiv.org/abs/2010.09107) (Xu et al. 2021a). <!-- Please refer to codes in this repository for usage, as those downloaded from [PMLR]() had not been clearly explained. --> <!-- Put a link here once PMLR shows my work -->
+>**Important Update:** 
+> - The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). <!-- Please refer to codes in this repository for usage, as those downloaded from [PMLR]() had not been clearly explained. -->
+> - We have significantly revised and extended the ICML 2021 work, which is now under review by the Journal of Machine Learning Research. The [_JMLR_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/JMLR_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
+> - The journal version is available on [arxiv](https://arxiv.org/abs/2010.09107).
 
 > Please cite our work through [PMLR V139](http://proceedings.mlr.press/v139/xu21h.html) if you find it interesting and inspiring to your work. Please use codes in this repository, as those downloaded from PMLR are not the most updated ones.
 
@@ -52,5 +53,6 @@
 
 ## References
 - Xu, Chen and Yao Xie (2021a). Conformal prediction interval for dynamic time-series. The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.
-- Xu, Chen and Yao Xie (2021b). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. arXiv: 2105.11886 [stat.AP].
+- Xu, Chen and Yao Xie (2021b). Conformal prediction for dynamic time-series. Under review by the Journal of Machine Learning Research
+- Xu, Chen and Yao Xie (2021c). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. arXiv: 2105.11886 [stat.AP].
 
