@@ -1,5 +1,5 @@
-
-- Please see the [_main_ branch](https://github.com/hamrel-cxu/EnbPI/tree/main) on how the code should be used and what are included in the ICML conference version
+## Description 
+- Please see the [_main_ branch](https://github.com/hamrel-cxu/EnbPI/tree/main) on how the code should be used and what are included in the ICML conference version. The .py test files below are all written in Jupyter notebook format, so that they are meant to be executed line by line.
 - **Difference from earlier**
   - Include [tests_simulation_journal.py](https://github.com/hamrel-cxu/EnbPI/blob/JMLR_code/tests_simulation_journal.py)
   - Delete test_paper.py, with [tests_paper+supp_journal.py](https://github.com/hamrel-cxu/EnbPI/blob/JMLR_code/tests_paper%2Bsupp_journal.py) containing everything to reproduce real-data results in the main text and in the appendix
