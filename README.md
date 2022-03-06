@@ -1,21 +1,43 @@
-# Sequential Distribution-free Ensemble Batch Prediction Intervals (EnbPI)
-
->**Important Update:** 
-> - The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). <!-- Please refer to codes in this repository for usage, as those downloaded from [PMLR]() had not been clearly explained. -->
-> - We have significantly revised and extended the ICML 2021 work, which is now under review by the Journal of Machine Learning Research. The [_JMLR_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/JMLR_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
-> - The journal version is available on [arxiv](https://arxiv.org/abs/2010.09107).
-
-> Please cite our work through [PMLR V139](http://proceedings.mlr.press/v139/xu21h.html) if you find it interesting and inspiring to your work. Please use codes in this repository, as those downloaded from PMLR are not the most updated ones.
-
-> Please direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
+# Ensemble batch prediction intervals (EnbPI)
 
 ## Table of Contents
+* [Important Notes](#important-notes)
 * [How to use](#how-to-use)
 * [Poster Talk and Slides](#poster-talk-and-slides)
 * [Extension Works and Ideas](#extension-works-and-ideas)
 * [FAQ](#faq)
 * [References](#references)
 <!-- * [License](#license) -->
+
+## Important Notes
+- The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). Please use codes in this repository, as those downloaded from PMLR are not the most updated ones. You may direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
+- We have significantly revised and extended the ICML 2021 work, which is now under revision by the Journal of Machine Learning Research. The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_JMLR_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/JMLR_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
+- We are excited that the work is being integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
+- Please cite our work via either way as shown below if you find it interesting and inspiring to your work. As explained earlier, the arxiv version is more extensive and recent, but is still under revision.
+```
+@InProceedings{pmlr-v139-xu21h,
+  title = 	 {Conformal prediction interval for dynamic time-series},
+  author =       {Xu, Chen and Xie, Yao},
+  booktitle = 	 {Proceedings of the 38th International Conference on Machine Learning},
+  pages = 	 {11559--11569},
+  year = 	 {2021},
+  editor = 	 {Meila, Marina and Zhang, Tong},
+  volume = 	 {139},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {18--24 Jul},
+  publisher =    {PMLR}
+```
+
+```
+@misc{xu2021conformal,
+      title={Conformal prediction for dynamic time-series}, 
+      author={Chen Xu and Yao Xie},
+      year={2021},
+      eprint={2010.09107},
+      archivePrefix={arXiv},
+      primaryClass={stat.ME}
+}
+```
 
 ## How to use
 - **Required Dependency:** 
