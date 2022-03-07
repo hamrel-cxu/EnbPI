@@ -199,6 +199,7 @@ class prediction_interval():
         n1 = len(self.X_predict)
         boot_samples_idx = self.JaB_boot_samples_idx
         boot_predictions = self.JaB_boot_predictions
+        B = len(boot_predictions)
         in_boot_sample = np.zeros((B, n), dtype=bool)
         for b in range(len(in_boot_sample)):
             in_boot_sample[b, boot_samples_idx[b]] = True
