@@ -11,9 +11,9 @@
 
 ## Important Notes
 - The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). Please use codes in this repository, as those downloaded from PMLR are not the most updated ones. You may direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
-- We have significantly revised and extended the ICML 2021 work, which is now under revision by the Journal of Machine Learning Research. The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_JMLR_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/JMLR_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
-- We are excited that the work is being integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
-- Please cite our work via either way as shown below if you find it interesting and inspiring to your work. As explained earlier, *the arxiv version is more extensive and recent, but is still under revision.*
+- We have significantly revised and extended the ICML 2021 work, which is now under journal review. The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_Journal_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/Journal_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
+- We are excited that the work has been integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
+- Please cite our work via either way as shown below if you find it interesting and inspiring to your work. As explained earlier, **the arxiv version is more extensive and recent. It is also further refined to incorporate new thoughts.**
 ```
 @InProceedings{pmlr-v139-xu21h,
   title = 	 {Conformal prediction interval for dynamic time-series},
