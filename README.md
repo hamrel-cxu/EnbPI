@@ -29,10 +29,10 @@
 ```
 
 ```
-@misc{xu2021conformal,
-      title={Conformal prediction for dynamic time-series}, 
+@misc{xu2022conformal,
+      title={Conformal prediction for time-series}, 
       author={Chen Xu and Yao Xie},
-      year={2021},
+      year={2022},
       eprint={2010.09107},
       archivePrefix={arXiv},
       primaryClass={stat.ME}
