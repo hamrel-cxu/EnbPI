@@ -1,0 +1,6 @@
+pandas~=1.5
+seaborn~=0.12
+pyod~=1.0
+keras~=2.11
+chart_studio~=1.1
+sktime~=0.16

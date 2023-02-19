@@ -1,0 +1,12 @@
+# Ignore vscode
+.vscode/**
+.vscode/
+.devcontainer/
+
+# Environments
+.venv
+venv/
+venv.bak/
+
+# coverage / cache
+.pytest_cache/
