@@ -16,9 +16,9 @@
   - Include [tests_simulation_journal.py](https://github.com/hamrel-cxu/EnbPI/blob/JMLR_code/tests_simulation_journal.py)
   - Delete test_paper.py, with [tests_paper+supp_journal.py](https://github.com/hamrel-cxu/EnbPI/blob/JMLR_code/tests_paper%2Bsupp_journal.py) containing everything to reproduce real-data results in the main text and in the appendix
   - Delete PI_class_ECAD.py, with [utils_ECAD_journal.py](https://github.com/hamrel-cxu/EnbPI/blob/JMLR_code/utils_ECAD_journal.py) containing all the functionalities.
-
+  
 ## References
-- Xu, Chen and Yao Xie (2022). Conformal prediction for time-series. *Journal version, under review.*
+- Xu, Chen and Yao Xie (2023). Conformal prediction for time-series. *Journal version, IEEE Transactions on Pattern Analysis and Machine Intelligence.*
+- Xu, Chen and Yao Xie (2021). Conformal prediction interval for dynamic time-series. *Conference version, The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.*
 - Xu, Chen and Yao Xie (2022). Conformal prediction set for time-series. *ICML 2022 Distribution-Free Uncertainty Quantification workshop.*
-- Xu, Chen and Yao Xie (2021). Conformal prediction interval for dynamic time-series. *The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.*
 - Xu, Chen and Yao Xie (2021). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. *ICML 2021 Distribution-Free Uncertainty Quantification workshop.*
