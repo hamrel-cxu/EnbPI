@@ -11,8 +11,8 @@
 
 ## Important Notes
 - The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). Please use codes in this repository, as those downloaded from PMLR are not the most updated ones. You may direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
-- We have significantly revised and extended the ICML 2021 work, which is now under journal review. The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_Journal_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/Journal_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
-- We are excited that the work has been integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
+- We have significantly revised and extended the ICML 2021 work, which is accepted by [IEEE Transactions on Pattern Analysis and Machine Intelligence](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=34). The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_Journal_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/Journal_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
+- We are excited that the work has been integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference. It has also been a part of AWS [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/index.html#).
 - Please cite our work via either way as shown below if you find it interesting and inspiring to your work. As explained earlier, **the arxiv version is more extensive and recent. It is also further refined to incorporate new thoughts.**
 ```
 @InProceedings{pmlr-v139-xu21h,
@@ -75,8 +75,8 @@
 - See [this github answer](https://stackoverflow.com/questions/66207609/notimplementederror-cannot-convert-a-symbolic-tensor-lstm-2-strided-slice0-t) to resolve the problem, primarily due to numpy & python version issues.
 
 ## References
-- Xu, Chen and Yao Xie (2022). Conformal prediction for time-series. *Journal version, under review.*
+- Xu, Chen and Yao Xie (2023). Conformal prediction for time-series. *Journal version, IEEE Transactions on Pattern Analysis and Machine Intelligence.*
+- Xu, Chen and Yao Xie (2021). Conformal prediction interval for dynamic time-series. *Conference version, The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.*
 - Xu, Chen and Yao Xie (2022). Conformal prediction set for time-series. *ICML 2022 Distribution-Free Uncertainty Quantification workshop.*
-- Xu, Chen and Yao Xie (2021). Conformal prediction interval for dynamic time-series. *The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.*
 - Xu, Chen and Yao Xie (2021). Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data. *ICML 2021 Distribution-Free Uncertainty Quantification workshop.*
 
