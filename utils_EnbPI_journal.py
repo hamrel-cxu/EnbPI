@@ -1,308 +1,211 @@
+
+
+import matplotlib.pyplot as plt
+from numba import njit
 from scipy.stats import skewnorm
 from scipy.linalg import norm
-from sklearn.linear_model import RidgeCV
-from sklearn.linear_model import LassoCV
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.neural_network import MLPRegressor
-from sklearn.linear_model import Ridge
-from sklearn import preprocessing
-import seaborn as sns
-import pickle
-from matplotlib.ticker import MaxNLocator
-from matplotlib.pyplot import figure
-import matplotlib.pyplot as plt
-import itertools
-import pandas as pd
+from scipy.sparse import random as sp_random
+from scipy.stats import norm
+from typing import Callable, Dict, Optional
+from pydantic import BaseModel, Field
 import numpy as np
 import math
-from numpy.random import choice
-from scipy.stats import norm
-from scipy.sparse import random
-import warnings
-import PI_class_EnbPI_journal as EnbPI  # For me
-import os
-import matplotlib.cm as cm
-import time
-
-# from keras.layers import LSTM, Dense, Dropout
-# from keras.models import Sequential
-# from tensorflow.keras.optimizers import Adam
-import calendar
-import matplotlib.transforms as transforms
-import importlib
-import sys
-
-import bootstraps
-
-importlib.reload(sys.modules["PI_class_EnbPI_journal"])  # For me
-"""Simulation Section """
-"""Define True Models and Errors """
 
 
-def F_inv(alpha):
+class ModelConfig(BaseModel):
+    seed: int = Field(0, description="Random seed for reproducibility.")
+    alpha: float = Field(..., description="Alpha parameter.")
+    rho: float = Field(
+        0.6, description="Rho parameter for stronglymixing model.")
+    T_tot: int = Field(
+        1000, description="Total number of time series data points.")
+    tseries: bool = Field(
+        False, description="True if the model is a time series.")
+    high_dim: bool = Field(
+        True, description="True if the model is high dimensional.")
+    change_points: bool = Field(
+        False, description="True if change points are to be included.")
+    change_frac: float = Field(
+        0.6, description="Fraction of time series before change point.")
+    stronglymixing: bool = Field(
+        False, description="True if errors are strongly mixing.")
+
+
+class DataGenerator:
     """
-    Description:
+    This class represents a data generator for time series simulation. 
+    It contains several methods to generate data based on different types of true models and errors. 
+    """
+
+    def __init__(self, config: ModelConfig):
+        """
+        Constructor for DataGenerator
+        """
+        np.random.seed(config.seed)
+        self.config = config
+
+    @njit
+    def F_inv(self) -> float:
+        """
         Used to compute oracle width when errors are not strongly mixing. It is a skewed normal.
-    """
-    rv = skewnorm(a=5, loc=0, scale=1)  # a is skewness parameter
-    return rv.ppf(alpha)
+        """
+        rv = skewnorm(a=5, loc=0, scale=1)  # a is skewness parameter
+        return rv.ppf(self.config.alpha)
 
-
-def F_inv_stronglymixing(alpha):
-    """
-    Description:
+    @njit
+    def F_inv_stronglymixing(self) -> float:
+        """
         Used to compute oracle width when errors are strongly mixing. Hidden xi_t follow normal distribution
+        """
+        mean = 0 / (1 - self.config.rho)
+        std = np.sqrt(0.1 / (1 - self.config.rho**2))
+        return norm.ppf(self.config.alpha, loc=mean, scale=std)
+
+    @njit
+    def F_inv_stronglymixingDGP(self) -> float:
+        """
+        Apply the inverse cumulative function of a normal distribution to a value alpha.
+        """
+        return norm.ppf(self.config.alpha, loc=0, scale=np.sqrt(0.1))
+
+    @njit
+    def generate_errors(self) -> np.array:
+        """
+        Generate errors for the DGP.
+        """
+        if self.config.stronglymixing:
+            return self.generate_stronglymixing_errors()
+        else:
+            return self.generate_weaklymixing_errors()
+
+    @njit
+    def generate_weaklymixing_errors(self) -> np.array:
+        """
+        Generate errors for weakly mixing DGP.
+        """
+        rv = skewnorm(a=5, loc=0, scale=1)  # a is skewness parameter
+        return rv.rvs(size=self.config.T_tot)
+
+    @njit
+    def generate_stronglymixing_errors(self) -> np.array:
+        """
+        Generate errors for strongly mixing DGP.
+        """
+        xi = np.zeros(self.config.T_tot)
+        xi[0] = np.random.normal(0, np.sqrt(0.1))
+        for t in range(1, self.config.T_tot):
+            xi[t] = self.config.rho * xi[t - 1] + \
+                np.random.normal(0, np.sqrt(0.1))
+        return xi
+
+    @njit
+    def generate_DGP(self, errors: np.array) -> np.array:
+        """
+        Generate DGP based on model parameters.
+        """
+        if self.config.change_points:
+            return self.generate_change_point_DGP(errors)
+        else:
+            return self.generate_non_change_point_DGP(errors)
+
+    @njit
+    def generate_change_point_DGP(self, errors: np.array) -> np.array:
+        """
+        Generate DGP with change points.
+        """
+        t_change = int(self.config.T_tot * self.config.change_frac)
+        theta_pre = np.random.uniform(-1, 1, size=1)
+        theta_post = np.random.uniform(-1, 1, size=1)
+        X = np.random.normal(0, 1, size=self.config.T_tot)
+        y = np.zeros(self.config.T_tot)
+        y[:t_change] = theta_pre * X[:t_change] + errors[:t_change]
+        y[t_change:] = theta_post * X[t_change:] + errors[t_change:]
+        return y
+
+    @njit
+    def generate_non_change_point_DGP(self, errors: np.array) -> np.array:
+        """
+        Generate DGP without change points.
+        """
+        theta = np.random.uniform(-1, 1, size=1)
+        X = np.random.normal(0, 1, size=self.config.T_tot)
+        return theta * X + errors
+
+    def generate_data(self) -> np.array:
+        """
+        Generate data based on model parameters.
+        """
+        errors = self.generate_errors()
+        return self.generate_DGP(errors)
+
+
+class Plotter:
     """
-    rho = 0.6
-    mean = 0 / (1 - rho)
-    std = np.sqrt(0.1 / (1 - rho**2))
-    return norm.ppf(alpha, loc=mean, scale=std)
-
-
-def F_inv_stronglymixingDGP(alpha):
-    return norm.ppf(alpha, loc=0, scale=np.sqrt(0.1))
-
-
-def beta_star_comp(alpha, stronglymixing):
-    # NOTE, just do this numerically, since F_inv typically do not have closed form so taking gradient to minimize the difference is not needed
-    bins = 1000
-    if stronglymixing:
-        Finv = F_inv_stronglymixing
-    else:
-        Finv = F_inv
-    beta_is = np.linspace(start=0, stop=alpha, num=bins)
-    width = np.zeros(bins)
-    for i in range(bins):
-        width[i] = Finv(1 - alpha + beta_is[i]) - Finv(beta_is[i])
-    i_star = np.argmin(width)
-    return beta_is[i_star]
-
-
-def True_mod_linear_pre(feature):
+    This class is for plotting the results.
     """
-    Input:
-    Output:
-    Description:
-        f(feature): R^d -> R
-    """
-    # Attempt 0: Fit Linear model on this data
-    d = len(feature)
-    np.random.seed(0)
-    beta0 = np.random.uniform(size=d)  # fully non-missing
-    return beta0.dot(feature)
 
+    def __init__(self):
+        """
+        Constructor for Plotter
+        """
+        pass
 
-def True_mod_linear_post(feature):
-    """
-    Input:
-    Output:
-    Description:
-        f(feature): R^d -> R
-    """
-    # Attempt 0: Fit Linear model on this data
-    d = len(feature)
-    np.random.seed(0)
-    beta0 = np.random.uniform(high=5, size=d)  # fully non-missing
-    return beta0.dot(feature)
-
-
-def True_mod_lasso_pre(feature):
-    """
-    Input:
-    Output:
-    Description:
-        f(feature): R^d -> R
-    """
-    # Attempt 2, pre change: High-dimensional linear model; coincide with the example I give for the assumption
-    d = len(feature)
-    np.random.seed(0)
-    # e.g. 20% of the entries are NON-missing
-    beta1 = random(1, d, density=0.2).A
-    return beta1.dot(feature)
-
-
-def True_mod_lasso_post(feature):
-    """
-    Input:
-    Output:
-    Description:
-        f(feature): R^d -> R
-    """
-    # Attempt 2, post change: High-dimensional linear model; coincide with the example I give for the assumption
-    d = len(feature)
-    np.random.seed(1)
-    # e.g. 40% of the entries are NON-missing
-    beta1 = random(1, d, density=0.4).A
-    return beta1.dot(feature)
-
-
-def True_mod_nonlinear_pre(feature):
-    """
-    Input:
-    Output:
-    Description:
-        f(feature): R^d -> R
-    """
-    # Attempt 3 Nonlinear model:
-    # f(X)=sqrt(1+(beta^TX)+(beta^TX)^2+(beta^TX)^3), where 1 is added in case beta^TX is zero
-    d = len(feature)
-    np.random.seed(0)
-    # e.g. 20% of the entries are NON-missing
-    beta1 = random(1, d, density=0.2).A
-    betaX = np.abs(beta1.dot(feature))
-    return np.sqrt(betaX + betaX**2 + betaX**3)
-
-
-def True_mod_nonlinear_post(feature, tseries=False):
-    d = len(feature)
-    np.random.seed(0)
-    # e.g. 20% of the entries are NON-missing
-    beta1 = random(1, d, density=0.2).A
-    betaX = np.abs(beta1.dot(feature))
-    if tseries:
-        return betaX + betaX**2 + betaX**3
-    else:
-        return (betaX + betaX**2 + betaX**3) ** (2 / 3)
-
-
-def DGP(
-    True_mod_pre,
-    True_mod_post="",
-    T_tot=1000,
-    tseries=False,
-    high_dim=True,
-    change_points=False,
-    change_frac=0.6,
-    stronglymixing=False,
-):
-    """
-    Description:
-        Create Y_t=f(X_t)+eps_t, eps_t ~ F from above
-        To draw eps_t ~ F, just use F^-1(U).
-    """
-    np.random.seed(0)
-    Y = np.zeros(T_tot)
-    FX = np.zeros(T_tot)
-    U = np.random.uniform(size=T_tot)
-    Errs = np.zeros(T_tot)
-    if stronglymixing:
-        Finv = F_inv_stronglymixingDGP
-        rho = 0.6
-    else:
-        Finv = F_inv
-        rho = 0
-    Errs[0] = Finv(U[0])
-    for i in range(1, T_tot):
-        Errs[i] = rho * Errs[i - 1] + Finv(U[i])
-    # NOTE; T_tot is NOT Ttrain, so if d is too large, we may never recover it well...
-    if tseries:
+    def quick_plt(
+        self,
+        Data_dc,
+        current_regr,
+        tseries,
+        stronglymixing,
+        change_points=False,
+        args=[]
+    ):
+        # Easy visualization of data
+        fig, ax = plt.subplots(figsize=(3, 3))
         if change_points:
-            # where change point appears
-            T_cut = math.ceil(change_frac * (T_tot - 100))
-            pre_change = DGP_tseries(True_mod_pre, T_cut + 100, Errs[: T_cut + 100])
-            post_change = DGP_tseries(
-                True_mod_post, T_tot - T_cut, Errs[T_cut:], tseries=True
+            Tstar, _ = args
+            start_plt = Tstar - 50
+            end_plt = Tstar + 50
+
+        else:
+            start_plt = -100
+            end_plt = -1
+        ax.plot(Data_dc["Y"][start_plt:end_plt], label=r"$Y_t$")
+        ax.plot(Data_dc["f(X)"][start_plt:end_plt], label=r"$f(X_t)$")
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.27), ncol=2)
+        tse = "_tseries" if tseries else ""
+        strongm = "_mixing" if stronglymixing else ""
+        regr_name = "_" + current_regr.__class__.__name__
+        if change_points:
+            plt.savefig(
+                f"Simulation/Raw_data_changepts{tse}{strongm}{regr_name}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                pad_inches=0,
             )
-            data_full = {}
-            for key in pre_change.keys():
-                # Note, CANNOT use np.append, as arrays are 2D
-                data_full[key] = np.concatenate((pre_change[key], post_change[key]))
-            return data_full
         else:
-            return DGP_tseries(True_mod_pre, T_tot, Errs)
-    else:
-        if high_dim:
-            # NOTE: When ||d||_0=c d I need d ~ (1-e^{-1})/c T = (1-e^{-1})/c * (T_tot * train_frac) to AT LEAST allow possible recovery by each S_b. So if I want better approximation (e.g. ||d||_0 = c2 |S_b|), I would let d ~ (1-e^{-1})/c * T_tot*train_frac*c_2. HERE, train_frac=0.5, c=0.2, so we can tweak c2 to roughly have d ~ 0.8 T_tot
-            d = math.ceil(T_tot * 0.8)
-        else:
-            d = math.ceil(T_tot / 10)
-        X = np.random.random((T_tot, d))
-        if change_points:
-            # where change point appears
-            T_cut = math.ceil(change_frac * T_tot)
-            for i in range(T_cut):
-                FX[i] = True_mod_pre(X[i])
-                Y[i] = FX[i] + Errs[i]
-            for i in range(T_cut, T_tot):
-                FX[i] = True_mod_post(X[i])
-                Y[i] = FX[i] + Errs[i]
-        else:
-            for i in range(T_tot):
-                FX[i] = True_mod_pre(X[i])
-                Y[i] = FX[i] + Errs[i]
-        return {"Y": Y, "X": X, "f(X)": FX, "Eps": Errs}
+            plt.savefig(
+                f"Simulation/Raw_data_nochangepts{tse}{strongm}{regr_name}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                pad_inches=0,
+            )
+        plt.show()
 
 
-def DGP_tseries(True_mod, T_tot, Errs, tseries=False):
+def main():
     """
-    Description:
-        Create Y_t=f(X_t)+eps_t, eps_t ~ F from above
-        To draw eps_t ~ F, just use F^-1(U).
+    Main function to generate and plot the data.
     """
-    np.random.seed(0)
-    Y = np.zeros(T_tot)
-    FX = np.zeros(T_tot)
-    # NOTE; T_tot is NOT Ttrain, so if d is too large, we may never recover it well...
-    d = 100  # Can be anything
-    X = np.zeros((T_tot - d, d))
-    # Initialize the first two by hand, because "True_mod" must take a vector
-    Y[0] = Errs[0]
-    # Because I assume features are normalized
-    FX[1] = np.random.uniform(size=1)
-    Y[1] = FX[1] + Errs[1]
-    for t in range(2, T_tot):
-        if t < d:
-            X_t = Y[:t]
-        if t > d:
-            X_t = Y[t - d : t]
-        X_t = (X_t - np.mean(X_t)) / np.std(X_t)
-        if t > d:
-            X[t - d] = X_t
-        if tseries:
-            FX[t] = True_mod(X_t, tseries=True)
-        else:
-            FX[t] = True_mod(X_t)
-        Y[t] = FX[t] + Errs[t]
-    Y = Y[d:]
-    FX = FX[d:]
-    Errs = Errs[d:]
-    return {"Y": Y, "X": X, "f(X)": FX, "Eps": Errs}
+    data_generator = DataGenerator(seed=1234)
+    T_tot = 1000
+    data = data_generator.DGP(
+        True_mod_pre=data_generator.True_mod_linear_pre, T_tot=T_tot)
+    Plotter.plot_time_series(Y=data['Y'], X=data['X'], F=data['F'])
+    Plotter.plot_scatter(Y=data['Y'], X=data['X'])
 
 
-def quick_plt(
-    Data_dc, current_regr, tseries, stronglymixing, change_points=False, args=[]
-):
-    # Easy visualization of data
-    fig, ax = plt.subplots(figsize=(3, 3))
-    if change_points:
-        Tstar, _ = args
-        start_plt = Tstar - 50
-        end_plt = Tstar + 50
-
-    else:
-        start_plt = -100
-        end_plt = -1
-    ax.plot(Data_dc["Y"][start_plt:end_plt], label=r"$Y_t$")
-    ax.plot(Data_dc["f(X)"][start_plt:end_plt], label=r"$f(X_t)$")
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.27), ncol=2)
-    tse = "_tseries" if tseries else ""
-    strongm = "_mixing" if stronglymixing else ""
-    regr_name = "_" + current_regr.__class__.__name__
-    if change_points:
-        plt.savefig(
-            f"Simulation/Raw_data_changepts{tse}{strongm}{regr_name}.pdf",
-            dpi=300,
-            bbox_inches="tight",
-            pad_inches=0,
-        )
-    else:
-        plt.savefig(
-            f"Simulation/Raw_data_nochangepts{tse}{strongm}{regr_name}.pdf",
-            dpi=300,
-            bbox_inches="tight",
-            pad_inches=0,
-        )
-    plt.show()
+if __name__ == "__main__":
+    main()
 
 
 """Fitting part"""
@@ -368,7 +271,7 @@ def visualize_everything(
     true_errs = Data_dc["Eps"]  # Include training data
     Ttrain = math.ceil(train_frac * len(true_errs))
     FX = Data_dc["f(X)"]  # Include training data
-    Y_predict = Data_dc["Y"][math.ceil(len(FX) * train_frac) :]
+    Y_predict = Data_dc["Y"][math.ceil(len(FX) * train_frac):]
     FXhat = result_mod.Ensemble_pred_interval_centers  # Only for T+1,...,T+T1
     PI = result_mod.Ensemble_pred_interval_ends  # Only for T+1,...,T+T1
     past_resid = result_mod.Ensemble_online_resid  # Include training LOO residuals
@@ -406,7 +309,7 @@ def visualize_everything(
     #     beta_star, alpha, FX[-len(FXhat):], FXhat, PI, Y_predict, stronglymixing)
     # 4. Create a simple version
     fig_ptwisewidth_simple = EmpvsActual_PtwiseWidth_simple(
-        beta_star, alpha, FX[-len(FXhat) :], FXhat, PI, Y_predict, stronglymixing
+        beta_star, alpha, FX[-len(FXhat)                             :], FXhat, PI, Y_predict, stronglymixing
     )
     name = "Simulation"
     if save_fig:
@@ -626,12 +529,12 @@ def one_dimen_transform(Y_train, Y_predict, d):
     X_train = np.zeros((n - d, d))  # from d+1,...,n
     X_predict = np.zeros((n1, d))  # from n-d,...,n+n1-d
     for i in range(n - d):
-        X_train[i, :] = Y_train[i : i + d]
+        X_train[i, :] = Y_train[i: i + d]
     for i in range(n1):
         if i < d:
-            X_predict[i, :] = np.r_[Y_train[n - d + i :], Y_predict[:i]]
+            X_predict[i, :] = np.r_[Y_train[n - d + i:], Y_predict[:i]]
         else:
-            X_predict[i, :] = Y_predict[i - d : i]
+            X_predict[i, :] = Y_predict[i - d: i]
     Y_train = Y_train[d:]
     return [X_train, X_predict, Y_train, Y_predict]
 
@@ -740,7 +643,8 @@ def val_to_pdf_or_cdf(value_ls, which):
         ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.27), ncol=2)
     else:
         ax.plot(bins_count_t[1:], cdf_t, color="black", label=r"$F_{T+1}$")
-        ax.plot(bins_count_e[1:], cdf_e, color="blue", label=r"$\hat{F}_{T+1}$")
+        ax.plot(bins_count_e[1:], cdf_e, color="blue",
+                label=r"$\hat{F}_{T+1}$")
         ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.27), ncol=2)
     plt.show()
     return fig
@@ -805,7 +709,8 @@ def EmpvsActual_PtwiseWidth(
     # True values
     ax[0].plot(FX[start_plt:end_plt], color="black", label=r"$f(X_t)$")
     wid = 1
-    ax[0].plot(Y_predict[start_plt:end_plt], color="red", label=r"$Y_t$", linewidth=wid)
+    ax[0].plot(Y_predict[start_plt:end_plt], color="red",
+               label=r"$Y_t$", linewidth=wid)
     ax[0].plot(
         upper_t[start_plt:end_plt],
         color="blue",
@@ -822,8 +727,10 @@ def EmpvsActual_PtwiseWidth(
         ncol=2,
     )
     # Estimated values
-    ax[1].plot(FXhat[start_plt:end_plt], color="black", label=r"$\hat{f}(X_t)$")
-    ax[1].plot(Y_predict[start_plt:end_plt], color="red", label=r"$Y_t$", linewidth=wid)
+    ax[1].plot(FXhat[start_plt:end_plt],
+               color="black", label=r"$\hat{f}(X_t)$")
+    ax[1].plot(Y_predict[start_plt:end_plt], color="red",
+               label=r"$Y_t$", linewidth=wid)
     ax[1].plot(
         upper_e[start_plt:end_plt],
         color="blue",
@@ -923,7 +830,8 @@ def EmpvsActual_AveWidth(
         fig, ax = plt.subplots(figsize=(9, 3))
     else:
         fig, ax = plt.subplots(figsize=(12, 3))
-    dic = pd.DataFrame(mean_width_dic.items(), columns=["T_ls", "est_mean_width"])
+    dic = pd.DataFrame(mean_width_dic.items(), columns=[
+                       "T_ls", "est_mean_width"])
     est_mean_width, T_ls = dic["est_mean_width"], dic["T_ls"]
     ax.plot(
         T_ls, est_mean_width, marker="o", color="blue", label="EnbPI"
@@ -962,7 +870,8 @@ def EmpvsActual_AveWidth(
     ax.tick_params(axis="y", color="red")
     # ax2.legend(loc='center left', bbox_to_anchor=(0.5, 1.2), title='Marginal Coverage', ncol=2)
     if cond_cov:
-        plt.rcParams.update({"legend.fontsize": 11, "legend.title_fontsize": 11})
+        plt.rcParams.update(
+            {"legend.fontsize": 11, "legend.title_fontsize": 11})
         x1 = 0
         same = 0.24
         ax.legend(
@@ -980,7 +889,8 @@ def EmpvsActual_AveWidth(
         ax2.set_ylim(0.85, 1.05)
     else:
         same = 0.05
-        ax.legend(loc="lower left", title="Width", bbox_to_anchor=(0, same), ncol=2)
+        ax.legend(loc="lower left", title="Width",
+                  bbox_to_anchor=(0, same), ncol=2)
         ax2.legend(
             loc="lower left",
             bbox_to_anchor=(0.335, same),
@@ -1038,13 +948,15 @@ def plot_average_new(
                 results_method = results[(results["method"] == method)]
                 if data_name == "Network":
                     method_cov = (
-                        results_method.groupby(by=[x_axis_name, "node"], as_index=False)
+                        results_method.groupby(
+                            by=[x_axis_name, "node"], as_index=False)
                         .mean()
                         .groupby(x_axis_name)["coverage"]
                         .describe()
                     )  # Column with 50% is median
                     method_width = (
-                        results_method.groupby(by=[x_axis_name, "node"], as_index=False)
+                        results_method.groupby(
+                            by=[x_axis_name, "node"], as_index=False)
                         .mean()
                         .groupby(x_axis_name)["width"]
                         .describe()
@@ -1056,7 +968,8 @@ def plot_average_new(
                     method_width = results_method.groupby(x_axis_name)[
                         "width"
                     ].describe()  # Column with 50% is median
-                    method_cov["se"] = method_cov["std"] / np.sqrt(method_cov["count"])
+                    method_cov["se"] = method_cov["std"] / \
+                        np.sqrt(method_cov["count"])
                     method_width["se"] = method_width["std"] / np.sqrt(
                         method_width["count"]
                     )
@@ -1065,7 +978,8 @@ def plot_average_new(
             else:
                 for fit_func in muh_fun:
                     results_method = results[
-                        (results["method"] == method) & (results["muh_fun"] == fit_func)
+                        (results["method"] == method) & (
+                            results["muh_fun"] == fit_func)
                     ]
                     if data_name == "Network":
                         method_cov = (
@@ -1091,7 +1005,8 @@ def plot_average_new(
                         method_width = results_method.groupby(x_axis_name)[
                             "width"
                         ].describe()  # Column with 50% is median
-                    method_cov["se"] = method_cov["std"] / np.sqrt(method_cov["count"])
+                    method_cov["se"] = method_cov["std"] / \
+                        np.sqrt(method_cov["count"])
                     method_width["se"] = method_width["std"] / np.sqrt(
                         method_width["count"]
                     )
@@ -1140,7 +1055,8 @@ def plot_average_new(
                     facecolor=colors[i],
                 )
                 ax[j, first].set_ylim(0.7, 1)
-                ax[j, first].tick_params(axis="both", which="major", labelsize=tickfont)
+                ax[j, first].tick_params(
+                    axis="both", which="major", labelsize=tickfont)
                 # Width
                 ax[j, second].plot(
                     x_axis,
@@ -1162,7 +1078,8 @@ def plot_average_new(
                 )
                 # Legends, target coverage, labels...
                 # Set label
-                ax[j, first].plot(x_axis, x_axis, linestyle="-.", color="green")
+                ax[j, first].plot(
+                    x_axis, x_axis, linestyle="-.", color="green")
                 # x_ax = ax[j, first].axes.get_xaxis()
                 # x_ax.set_visible(False)
                 nrow = len(Dataname)
@@ -1186,7 +1103,8 @@ def plot_average_new(
                     facecolor=colors[i],
                 )
                 ax[first].set_ylim(0.7, 1)
-                ax[first].tick_params(axis="both", which="major", labelsize=tickfont)
+                ax[first].tick_params(
+                    axis="both", which="major", labelsize=tickfont)
                 # Width
                 ax[second].plot(
                     x_axis,
@@ -1203,7 +1121,8 @@ def plot_average_new(
                     alpha=0.35,
                     facecolor=colors[i],
                 )
-                ax[second].tick_params(axis="both", which="major", labelsize=tickfont)
+                ax[second].tick_params(
+                    axis="both", which="major", labelsize=tickfont)
                 # Legends, target coverage, labels...
                 # Set label
                 ax[first].plot(x_axis, x_axis, linestyle="-.", color="green")
@@ -1275,13 +1194,16 @@ def grouped_box_new(dataname, type, extra_save=""):
     results.sort_values("method", inplace=True, ascending=True)
     results.loc[results.method == "Ensemble", "method"] = "EnbPI"
     results.loc[results.method == "Weighted_ICP", "method"] = "Weighted ICP"
-    results_1d = pd.read_csv(f"Results/{dataname}_many_train_new_1d{extra_save}.csv")
+    results_1d = pd.read_csv(
+        f"Results/{dataname}_many_train_new_1d{extra_save}.csv")
     results_1d.sort_values("method", inplace=True, ascending=True)
     results_1d.loc[results_1d.method == "Ensemble", "method"] = "EnbPI"
-    results_1d.loc[results_1d.method == "Weighted_ICP", "method"] = "Weighted ICP"
+    results_1d.loc[results_1d.method ==
+                   "Weighted_ICP", "method"] = "Weighted ICP"
     if "Sequential" in np.array(results.muh_fun):
         results["muh_fun"].replace({"Sequential": "NeuralNet"}, inplace=True)
-        results_1d["muh_fun"].replace({"Sequential": "NeuralNet"}, inplace=True)
+        results_1d["muh_fun"].replace(
+            {"Sequential": "NeuralNet"}, inplace=True)
     regrs = np.unique(results.muh_fun)
     regrs_label = {
         "RidgeCV": "Ridge",
@@ -1297,10 +1219,12 @@ def grouped_box_new(dataname, type, extra_save=""):
         ncol = 3  # Ridge, RF, NN
         regrs = ["RidgeCV", "NeuralNet", "RNN"]
     if type == "coverage":
-        f, ax = plt.subplots(2, ncol, figsize=(3 * ncol, 6), sharex=True, sharey=True)
+        f, ax = plt.subplots(2, ncol, figsize=(
+            3 * ncol, 6), sharex=True, sharey=True)
     else:
         # all plots in same row share y-axis
-        f, ax = plt.subplots(2, ncol, figsize=(3 * ncol, 6), sharex=True, sharey=True)
+        f, ax = plt.subplots(2, ncol, figsize=(
+            3 * ncol, 6), sharex=True, sharey=True)
     f.tight_layout(pad=0)
     # Prepare for plot
     d = 20
@@ -1364,7 +1288,8 @@ def grouped_box_new(dataname, type, extra_save=""):
                 ax[1, 0].set_ylabel("Univariate", fontsize=label_size)
                 if i == 1:
                     # X-label on
-                    ax[1, j].set_xlabel(r"$\%$ of Total Data", fontsize=label_size)
+                    ax[1, j].set_xlabel(
+                        r"$\%$ of Total Data", fontsize=label_size)
                 else:
                     # X-label off
                     x_axis = ax[i, j].axes.get_xaxis()
@@ -1378,7 +1303,8 @@ def grouped_box_new(dataname, type, extra_save=""):
                     y_axis.set_visible(False)
                 if i == 1:
                     # X-label on
-                    ax[1, j].set_xlabel(r"$\%$ of Total Data", fontsize=label_size)
+                    ax[1, j].set_xlabel(
+                        r"$\%$ of Total Data", fontsize=label_size)
                 else:
                     # X-label off
                     x_axis = ax[i, j].axes.get_xaxis()
@@ -1414,12 +1340,14 @@ def set_share_axes(axs, target=None, sharex=False, sharey=False):
     # Turn off x tick labels and offset text for all but the bottom row
     if sharex and axs.ndim > 1:
         for ax in axs[:-1, :].flat:
-            ax.xaxis.set_tick_params(which="both", labelbottom=False, labeltop=False)
+            ax.xaxis.set_tick_params(
+                which="both", labelbottom=False, labeltop=False)
             ax.xaxis.offsetText.set_visible(False)
     # Turn off y tick labels and offset text for all but the left most column
     if sharey and axs.ndim > 1:
         for ax in axs[:, 1:].flat:
-            ax.yaxis.set_tick_params(which="both", labelleft=False, labelright=False)
+            ax.yaxis.set_tick_params(
+                which="both", labelleft=False, labelright=False)
             ax.yaxis.offsetText.set_visible(False)
 
 
@@ -1553,7 +1481,8 @@ def grouped_box_new_with_JaB(dataname):
     # plt.legend(loc='upper center',
     #            bbox_to_anchor=(-0.15, -0.25), ncol=3, fontsize=font_size)
     plt.tight_layout(pad=0)
-    plt.legend(loc="upper right", bbox_to_anchor=(1, -0.3), ncol=3, fontsize=font_size)
+    plt.legend(loc="upper right", bbox_to_anchor=(
+        1, -0.3), ncol=3, fontsize=font_size)
     plt.savefig(
         f"{dataname}_boxplot_rebuttal.pdf", dpi=300, bbox_inches="tight", pad_inches=0
     )
@@ -1661,12 +1590,15 @@ def PI_on_series_plus_cov_or_not(
         if stride == 24:
             current_figure.set_title(f"At {hour}:00 \n Coverage is {coverage}")
         elif stride == 5 or no_slide:
-            current_figure.set_title(f"At {hour+10}:00 \n Coverage is {coverage}")
+            current_figure.set_title(
+                f"At {hour+10}:00 \n Coverage is {coverage}")
         else:
             if stride == 15:
-                current_figure.set_title(f"At {hour+5}:00 \n Coverage is {coverage}")
+                current_figure.set_title(
+                    f"At {hour+5}:00 \n Coverage is {coverage}")
             else:
-                current_figure.set_title(f"At {hour+6}:00 \n Coverage is {coverage}")
+                current_figure.set_title(
+                    f"At {hour+6}:00 \n Coverage is {coverage}")
         # if stride == 14:
         #     # Sub data`
         #     current_figure.set_title(f'At {hour+6}:00 \n Coverage is {coverage}')
@@ -1737,16 +1669,19 @@ def make_cond_plots(
                 else:
                     if data_name == "Solar_Atl":
                         # which_hours = [i-6 for i in [7, 8, 10, 11, 12, 13, 14, 16, 17]]
-                        which_hours = [i - 6 for i in [8, 9, 16, 17, 11, 12, 13, 14]]
+                        which_hours = [
+                            i - 6 for i in [8, 9, 16, 17, 11, 12, 13, 14]]
                     else:
                         # which_hours = [i-5 for i in [7, 8, 10, 11, 12, 13, 14, 16, 17]]
-                        which_hours = [i - 6 for i in [8, 9, 16, 17, 11, 12, 13, 14]]
+                        which_hours = [
+                            i - 6 for i in [8, 9, 16, 17, 11, 12, 13, 14]]
         which_method = "Ensemble"
         regr_methods = {0: "Ridge", 1: "RF", 2: "NN"}
         X_data_type = {True: "uni", False: "multi"}
         Xtype = X_data_type[one_d]
         slide = "_no_slide" if no_slide else "_daily_slide"
-        Dtype = {24: "_fulldata", 14: "_subdata", 15: "_subdata", 5: "_near_noon_data"}
+        Dtype = {24: "_fulldata", 14: "_subdata",
+                 15: "_subdata", 5: "_near_noon_data"}
         if no_slide:
             dtype = ""
         else:
@@ -1773,7 +1708,8 @@ def make_cond_plots(
 
 
 def make_cond_plots_Solar_Atl(results_dict, regr_name, Y_predict_ls, stride_ls):
-    plt.rcParams.update({"font.size": 24, "axes.titlesize": 24, "axes.labelsize": 24})
+    plt.rcParams.update(
+        {"font.size": 24, "axes.titlesize": 24, "axes.labelsize": 24})
     fig, ax = plt.subplots(
         4,
         4,
@@ -1805,7 +1741,8 @@ def make_cond_plots_Solar_Atl(results_dict, regr_name, Y_predict_ls, stride_ls):
             covered_or_not = []
             for j in range(n1):
                 if (
-                    Y_predict[indices_at_hour[j]] >= result["lower"][indices_at_hour[j]]
+                    Y_predict[indices_at_hour[j]
+                              ] >= result["lower"][indices_at_hour[j]]
                     and Y_predict[indices_at_hour[j]]
                     <= result["upper"][indices_at_hour[j]]
                 ):
@@ -1827,7 +1764,8 @@ def make_cond_plots_Solar_Atl(results_dict, regr_name, Y_predict_ls, stride_ls):
             )
             lower_vals = np.maximum(0, result["lower"][to_plot])
             upper_vals = np.maximum(0, result["upper"][to_plot])
-            current_figure.fill_between(x_axis, lower_vals, upper_vals, alpha=0.3)
+            current_figure.fill_between(
+                x_axis, lower_vals, upper_vals, alpha=0.3)
             xticks = np.linspace(0, plot_length - 30, 3).astype(int)  #
             xtick_labels = [
                 calendar.month_name[int(i / 30) + 4] for i in xticks
@@ -1836,7 +1774,8 @@ def make_cond_plots_Solar_Atl(results_dict, regr_name, Y_predict_ls, stride_ls):
             current_figure.set_xticklabels(xtick_labels)
             current_figure.tick_params(axis="x", rotation=15)
             hour_name = hour_label[i][hour]
-            current_figure.set_title(f"At {hour_name+1}:00 \n Coverage is {coverage}")
+            current_figure.set_title(
+                f"At {hour_name+1}:00 \n Coverage is {coverage}")
             current_figure = ax[row + 1, col]
             # # Histogram plot
             # sns.histplot(resid, bins=15, kde=True, ax=current_figure)
@@ -1844,17 +1783,21 @@ def make_cond_plots_Solar_Atl(results_dict, regr_name, Y_predict_ls, stride_ls):
             # current_figure.set_title(r'Histogram of $\{\hat{\epsilon_t}\}_{t=1}^T$')
             # Moving coverage
             N = 30  # e.g. average over past 20 days
-            moving_cov = np.convolve(covered_or_not, np.ones(N) / N, mode="valid")
-            current_figure.plot(moving_cov, color="red", label="Sliding Coverage")
+            moving_cov = np.convolve(
+                covered_or_not, np.ones(N) / N, mode="valid")
+            current_figure.plot(moving_cov, color="red",
+                                label="Sliding Coverage")
             # For axis purpose, subtract December
-            xticks = np.linspace(0, len(covered_or_not) - 31 - N + 1, 3).astype(int)
+            xticks = np.linspace(0, len(covered_or_not) -
+                                 31 - N + 1, 3).astype(int)
             xtick_labels = [
                 calendar.month_name[int(i / 30) + 4 + N // 30] for i in xticks
             ]  # Get months
             current_figure.set_xticks(xticks)
             current_figure.set_xticklabels(xtick_labels)
             current_figure.tick_params(axis="x", rotation=15)
-            current_figure.axhline(0.9, color="black", linewidth=3, linestyle="--")
+            current_figure.axhline(
+                0.9, color="black", linewidth=3, linestyle="--")
         i += 1
     fig2, ax = plt.subplots(2, 1, figsize=(7, 6 * 2))
     # Histogram plot
