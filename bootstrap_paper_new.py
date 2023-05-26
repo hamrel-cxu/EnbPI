@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
 from sklearn.linear_model import RidgeCV, LassoCV
 from numpy.random import default_rng
+from numba import jit
 
 
 class DataConfig(BaseModel):
@@ -44,7 +45,9 @@ class DataPreparation:
 
 
 class ARTransformer:
-    def one_dimen_transform(self, y_train, y_test, d):
+    @staticmethod
+    @jit(nopython=True)
+    def one_dimen_transform(y_train, y_test, d):
         n = len(y_train)
         n1 = len(y_test)
         X_train = np.zeros((n - d, d))  # from d+1,...,n
@@ -146,5 +149,3 @@ bootstrap_X_train, bootstrap_y_train = bootstrap.prepare_bootstrap(
 model = Model(model_name='RandomForestRegressor', bootstrap=bootstrap)
 models = model.fit_model(bootstrap_X_train, bootstrap_y_train)
 predictions = model.predict(models, X_test)
-
-# evaluate the predictions
