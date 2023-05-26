@@ -150,45 +150,41 @@ class Plotter:
         """
         pass
 
-    def quick_plt(
-        self,
-        Data_dc,
-        current_regr,
-        tseries,
-        stronglymixing,
-        change_points=False,
-        args=[]
-    ):
-        # Easy visualization of data
-        fig, ax = plt.subplots(figsize=(3, 3))
-        if change_points:
-            Tstar, _ = args
-            start_plt = Tstar - 50
-            end_plt = Tstar + 50
+    def plot_time_series(self, data, title='Time Series Plot', xlabel='Time', ylabel='Value'):
+        """
+        Method to plot a time series.
 
-        else:
-            start_plt = -100
-            end_plt = -1
-        ax.plot(Data_dc["Y"][start_plt:end_plt], label=r"$Y_t$")
-        ax.plot(Data_dc["f(X)"][start_plt:end_plt], label=r"$f(X_t)$")
-        ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.27), ncol=2)
-        tse = "_tseries" if tseries else ""
-        strongm = "_mixing" if stronglymixing else ""
-        regr_name = "_" + current_regr.__class__.__name__
-        if change_points:
-            plt.savefig(
-                f"Simulation/Raw_data_changepts{tse}{strongm}{regr_name}.pdf",
-                dpi=300,
-                bbox_inches="tight",
-                pad_inches=0,
-            )
-        else:
-            plt.savefig(
-                f"Simulation/Raw_data_nochangepts{tse}{strongm}{regr_name}.pdf",
-                dpi=300,
-                bbox_inches="tight",
-                pad_inches=0,
-            )
+        Parameters:
+        data (pandas.Series or pandas.DataFrame): The time series data to plot.
+        title (str): The title of the plot.
+        xlabel (str): The x-axis label.
+        ylabel (str): The y-axis label.
+        """
+        plt.figure(figsize=(10, 6))
+        plt.plot(data)
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid(True)
+        plt.show()
+
+    def plot_scatter(self, x, y, title='Scatter Plot', xlabel='X', ylabel='Y'):
+        """
+        Method to plot a scatter plot.
+
+        Parameters:
+        x (array-like): The data for the x-axis.
+        y (array-like): The data for the y-axis.
+        title (str): The title of the plot.
+        xlabel (str): The x-axis label.
+        ylabel (str): The y-axis label.
+        """
+        plt.figure(figsize=(10, 6))
+        plt.scatter(x, y)
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid(True)
         plt.show()
 
 
@@ -309,7 +305,8 @@ def visualize_everything(
     #     beta_star, alpha, FX[-len(FXhat):], FXhat, PI, Y_predict, stronglymixing)
     # 4. Create a simple version
     fig_ptwisewidth_simple = EmpvsActual_PtwiseWidth_simple(
-        beta_star, alpha, FX[-len(FXhat)                             :], FXhat, PI, Y_predict, stronglymixing
+        beta_star, alpha, FX[-len(FXhat)
+                                  :], FXhat, PI, Y_predict, stronglymixing
     )
     name = "Simulation"
     if save_fig:
