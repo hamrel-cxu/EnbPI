@@ -1,43 +1,31 @@
 # Ensemble batch prediction intervals (EnbPI)
 
 ## Table of Contents
-* [Important Notes](#important-notes)
+* [News and Notes](#news-and-notes)
+* [Open-source implementation](#open-source-implementation)
+* [Extension Works and Ideas](#extension-works-and-ideas)
 * [How to use](#how-to-use)
 * [Poster Talk and Slides](#poster-talk-and-slides)
-* [Extension Works and Ideas](#extension-works-and-ideas)
 * [FAQ](#faq)
 * [References](#references)
 <!-- * [License](#license) -->
 
-## Important Notes
+## News and Notes
 - The code and related material in this _main_ branch are for our ICML 2021 oral work, titled [Conformal Prediction Interval for Dynamic Time-series](http://proceedings.mlr.press/v139/xu21h.html) (Xu et al. 2021a). Please use codes in this repository, as those downloaded from PMLR are not the most updated ones. You may direct any inquiries either to [Chen Xu](https://sites.gatech.edu/chenxu97/) (cxu310@gatech.edu) or [Yao Xie](https://www2.isye.gatech.edu/~yxie77/index.html) (yao.xie@isye.gatech.edu). The work is constantly updated to incorporate new feedback and ideas. 
 - We have significantly revised and extended the ICML 2021 work, which is accepted by [IEEE Transactions on Pattern Analysis and Machine Intelligence](https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=34). The most recent version is available on [arxiv](https://arxiv.org/abs/2010.09107). The [_Journal_code_ branch](https://github.com/hamrel-cxu/EnbPI/tree/Journal_code) contains updated codes, which essentially follow the same structure as those in this branch. Nevertheless, feel free to message us if you have any question regarding either branch. 
-- We are excited that the work has been integrated as a part of the [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference. It has also been a part of AWS [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/index.html#).
-- Please cite our work via either way as shown below if you find it interesting and inspiring to your work. As explained earlier, **the arxiv version is more extensive and recent. It is also further refined to incorporate new thoughts.**
-```
-@InProceedings{pmlr-v139-xu21h,
-  title = 	 {Conformal prediction interval for dynamic time-series},
-  author =       {Xu, Chen and Xie, Yao},
-  booktitle = 	 {Proceedings of the 38th International Conference on Machine Learning},
-  pages = 	 {11559--11569},
-  year = 	 {2021},
-  editor = 	 {Meila, Marina and Zhang, Tong},
-  volume = 	 {139},
-  series = 	 {Proceedings of Machine Learning Research},
-  month = 	 {18--24 Jul},
-  publisher =    {PMLR}
-```
 
-```
-@misc{xu2022conformal,
-      title={Conformal prediction for time-series}, 
-      author={Chen Xu and Yao Xie},
-      year={2022},
-      eprint={2010.09107},
-      archivePrefix={arXiv},
-      primaryClass={stat.ME}
-}
-```
+## Open-source implementation
+- We are excited that the work has been integrated as a part of
+  1. [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
+  2. [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/index.html#) by Amazon AWS.
+  3. [PUNCC](https://deel-ai.github.io/puncc/regression.html#deel.puncc.regression.EnbPI) by the Artificial and Natural Intelligence Toulouse Institute.
+  4. [ConformalPrediction](https://juliatrustworthyai.github.io/ConformalPrediction.jl/stable/how_to_guides/timeseries/) for Trustworthy AI in Julia.
+
+## Extension Works and Ideas
+- 🌟[Sequential Predictive Conformal Inference for Time Series](https://proceedings.mlr.press/v202/xu23r)🌟 (Xu et al. 2023) is our latest work on this topic, where we advance EnbPI by considering *time-adaptive re-estimation of residual quantiles*, improving the performance of EnbPI and other recent CP methods.
+- [Conformal prediction set for time-series](https://arxiv.org/abs/2206.07851) (Xu et al. 2022) focuses on time-series classification. It has been strongly accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2022](https://sites.google.com/berkeley.edu/dfuq-22/)), with the [Poster here](https://github.com/hamrel-cxu/Ensemble-Regularized-Adaptive-Prediction-Set-ERAPS/blob/main/ICML%202022%20DFUQ%20Poster.jpeg).
+- [Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data](https://arxiv.org/abs/2105.11886) (Xu et al. 2021) adopts **EnbPI** for detecting anomalous traffic flows. Our method significantly outperforms competing methods (Table 1). It has been accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2021](https://sites.google.com/berkeley.edu/dfuq21/)), with the [Poster here](https://github.com/hamrel-cxu/EnbPI/blob/main/DFUQ%202021%20Anomaly%20Detection%20Poster.png).
+
 
 ## How to use
 - **Required Dependency:** 
@@ -65,16 +53,12 @@
 - We are fortunate to pre-record a long presentation and give an oral presentation at the Proceedings of the 38th International Conference on Machine Learning (ICML 2021). The long presentation is [available on Slideslive](https://recorder-v3.slideslive.com/?share=37762&s=ee12530c-5218-4c9e-8bb3-5107ceb79f41) and the oral presentation will be given at the conference once the date is finalized.
 - The slide for the talk is [available here](https://github.com/hamrel-cxu/EnbPI/blob/main/ICML2021_Slide.pdf).
 
-## Extension Works and Ideas
-- [Conformal prediction set for time-series](https://arxiv.org/abs/2206.07851) (Xu et al. 2022) is our recent work on time-series classification. It has been strongly accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2022](https://sites.google.com/berkeley.edu/dfuq-22/)), with the [Poster here](https://github.com/hamrel-cxu/Ensemble-Regularized-Adaptive-Prediction-Set-ERAPS/blob/main/ICML%202022%20DFUQ%20Poster.jpeg).
-- [Conformal Anomaly Detection on Spatio-Temporal Observations with Missing Data](https://arxiv.org/abs/2105.11886) (Xu et al. 2021) is our recent application work on adopting **EnbPI** for detecting anomalous traffic flows. Our method significantly outperforms competing methods (Table 1). It has been accepted by the Distribution-free Uncertainty Quantification Workshop in ICML 2021 ([DFUQ 2021](https://sites.google.com/berkeley.edu/dfuq21/)), with the [Poster here](https://github.com/hamrel-cxu/EnbPI/blob/main/DFUQ%202021%20Anomaly%20Detection%20Poster.png).
-
-
 ## FAQ
 1. Encountering "NotImplementedError: Cannot convert a symbolic Tensor (lstm_2/strided_slice:0) to a numpy array" when using RNN as the regression model:
 - See [this github answer](https://stackoverflow.com/questions/66207609/notimplementederror-cannot-convert-a-symbolic-tensor-lstm-2-strided-slice0-t) to resolve the problem, primarily due to numpy & python version issues.
 
 ## References
+- Xu, Chen and Yao Xie (2023). Sequential Predictive Conformal Inference for Time Series. *Proceedings of the 40th International Conference on Machine Learning, PMLR 202, 2023*
 - Xu, Chen and Yao Xie (2023). Conformal prediction for time-series. *Journal version, IEEE Transactions on Pattern Analysis and Machine Intelligence.*
 - Xu, Chen and Yao Xie (2021). Conformal prediction interval for dynamic time-series. *Conference version, The Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 2021.*
 - Xu, Chen and Yao Xie (2022). Conformal prediction set for time-series. *ICML 2022 Distribution-Free Uncertainty Quantification workshop.*
