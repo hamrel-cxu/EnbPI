@@ -17,7 +17,7 @@
 ## Open-source implementation
 - We are excited that the work has been integrated as a part of
   1. [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
-  2. [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/index.html#) by Amazon AWS.
+  2. [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/examples/enbpi_ts_regression.html) by Amazon AWS.
   3. [PUNCC](https://deel-ai.github.io/puncc/regression.html#deel.puncc.regression.EnbPI) by the Artificial and Natural Intelligence Toulouse Institute.
   4. [ConformalPrediction](https://juliatrustworthyai.github.io/ConformalPrediction.jl/stable/how_to_guides/timeseries/) for Trustworthy AI in Julia.
 
