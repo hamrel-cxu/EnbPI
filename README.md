@@ -1,15 +1,15 @@
 ## Description 
 - Please see the [_main_ branch](https://github.com/hamrel-cxu/EnbPI/tree/main) on how the code should be used and what are included in the ICML conference version. The .py test files below are all written in Jupyter notebook format, so that they are meant to be executed line by line.
-- Please cite the work currently as shown below, which is still under review.
 ```
-@misc{xu2022conformal,
-      title={Conformal prediction for time-series}, 
-      author={Chen Xu and Yao Xie},
-      year={2022},
-      eprint={2010.09107},
-      archivePrefix={arXiv},
-      primaryClass={stat.ME}
-}
+@ARTICLE{xu2023enbpi,
+  author={Xu, Chen and Xie, Yao},
+  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
+  title={Conformal Prediction for Time Series}, 
+  year={2023},
+  volume={45},
+  number={10},
+  pages={11575-11587},
+  doi={10.1109/TPAMI.2023.3272339}}
 ```
 ## Difference from earlier
   - **🌟🌟Include [Demo_code.ipynb](https://github.com/hamrel-cxu/EnbPI/blob/Journal_code/Demo_code.ipynb), which compares EnbPI, SPCI, Adaptive-CI, and NEX-CP WLS shown in Section 6.3 as a Jupyter notebook.🌟🌟**
