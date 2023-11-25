@@ -19,7 +19,8 @@
   1. [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), which is a scikit-learn-compatible module for predictive inference.
   2. [Fortuna](https://aws-fortuna.readthedocs.io/en/latest/examples/enbpi_ts_regression.html) by Amazon AWS.
   3. [PUNCC](https://deel-ai.github.io/puncc/regression.html#deel.puncc.regression.EnbPI) by the Artificial and Natural Intelligence Toulouse Institute.
-  4. [ConformalPrediction](https://juliatrustworthyai.github.io/ConformalPrediction.jl/stable/how_to_guides/timeseries/) for Trustworthy AI in Julia.
+  4. [functime.ai](https://docs.functime.ai/forecasting/#conformal-prediction) for production-ready time series models.
+  5. [ConformalPrediction](https://juliatrustworthyai.github.io/ConformalPrediction.jl/stable/how_to_guides/timeseries/) for Trustworthy AI in Julia.
 
 ## Extension Works and Ideas
 - 🌟[Sequential Predictive Conformal Inference for Time Series](https://proceedings.mlr.press/v202/xu23r)🌟 (Xu et al. 2023) is our latest work on this topic, where we advance EnbPI by considering *time-adaptive re-estimation of residual quantiles*, improving the performance of EnbPI and other recent CP methods.
